@@ -39,6 +39,9 @@ const locales: { [key: string]: Locale } = {
   pl: {
     text: "Polish",
   },
+  uk: {
+    text: "Українська",
+  },
   ru: {
     text: "Russian",
   },

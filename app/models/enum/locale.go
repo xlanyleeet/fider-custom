@@ -129,6 +129,16 @@ var (
 		IsRTL:             false,
 	}
 
+	// LocaleUkrainian represents Ukrainian
+	LocaleUkrainian = Locale{
+		Code:              "uk",
+		Name:              "Українська",
+		MessageFormatCode: "uk",
+		PostgresConfig:    "simple",
+		LinguaLanguage:    lingua.Ukrainian,
+		IsRTL:             false,
+	}
+
 	// LocaleRussian represents Russian
 	LocaleRussian = Locale{
 		Code:              "ru",
@@ -232,6 +242,7 @@ var (
 		LocaleKorean,
 		LocaleDutch,
 		LocalePolish,
+		LocaleUkrainian,
 		LocaleRussian,
 		LocaleSlovak,
 		LocaleTurkish,

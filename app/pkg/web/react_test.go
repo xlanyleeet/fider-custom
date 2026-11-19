@@ -61,6 +61,28 @@ func TestReactRenderer_RenderEmptyHomeHTML(t *testing.T) {
 	Expect(err).IsNil()
 }
 
+func TestReactRenderer_UkrainianHome(t *testing.T) {
+	RegisterT(t)
+	r, err := web.NewReactRenderer("ssr.js")
+	Expect(err).IsNil()
+	u, _ := url.Parse("https://feedback.test.fider.io")
+	html, err := r.Render(u, web.Map{
+		"page":     "Home/Home.page",
+		"tenant":   &entity.Tenant{Locale: "uk"},
+		"settings": web.Map{"locale": "uk"},
+		"props": web.Map{
+			"posts":          make([]web.Map, 0),
+			"tags":           make([]web.Map, 0),
+			"countPerStatus": web.Map{},
+		},
+	})
+	Expect(err).IsNil()
+	Expect(html).ContainsSubstring("Напишіть свою пропозицію…")
+	Expect(html).ContainsSubstring("Поки що немає жодної пропозиції.")
+	Expect(html).ContainsSubstring("План розвитку")
+	Expect(html).ContainsSubstring("Вихідний код (AGPL-3.0)")
+}
+
 func TestReactRenderer_RenderWithMaliciousURL(t *testing.T) {
 	RegisterT(t)
 
@@ -178,6 +200,14 @@ func TestReactRenderer_RenderHomeWithPosts_Plurals_Polish(t *testing.T) {
 	Expect(html).ContainsSubstring(`<span class="text-gray-700">Głos</span>`)
 	Expect(html).ContainsSubstring(`<span class="text-gray-700">Głosy</span>`)
 	Expect(html).ContainsSubstring(`<span class="text-gray-700">Głosów</span>`)
+}
+
+func TestReactRenderer_UkrainianVotePluralForms(t *testing.T) {
+	RegisterT(t)
+	html := renderHomeWithVotes(t, "uk")
+	Expect(html).ContainsSubstring(`<span class="text-gray-700">голос</span>`)
+	Expect(html).ContainsSubstring(`<span class="text-gray-700">голоси</span>`)
+	Expect(html).ContainsSubstring(`<span class="text-gray-700">голосів</span>`)
 }
 
 func TestReactRenderer_UnknownLocaleFallsBackToEnglish(t *testing.T) {

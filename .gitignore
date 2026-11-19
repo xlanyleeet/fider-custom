@@ -15,6 +15,7 @@ ssr.js
 .env.*
 **/.env.*
 !**/.env.example
+.artifacts/
 npm-debug.log
 
 profile.out

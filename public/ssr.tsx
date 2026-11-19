@@ -24,6 +24,7 @@ const messages: { [key: string]: any } = {
   fr: require(`../locale/fr/client`),
   ja: require(`../locale/ja/client`),
   pl: require(`../locale/pl/client`),
+  uk: require(`../locale/uk/client`),
   ru: require(`../locale/ru/client`),
   sk: require(`../locale/sk/client`),
   tr: require(`../locale/tr/client`),

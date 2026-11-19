@@ -9,4 +9,5 @@ scripts
 .env.*
 **/.env
 **/.env.*
+.artifacts
 dist
