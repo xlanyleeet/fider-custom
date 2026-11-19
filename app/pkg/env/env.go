@@ -101,9 +101,9 @@ type config struct {
 			ClientID string `env:"OAUTH_GOOGLE_CLIENTID"`
 			Secret   string `env:"OAUTH_GOOGLE_SECRET"`
 		}
-		Facebook struct {
-			AppID  string `env:"OAUTH_FACEBOOK_APPID"`
-			Secret string `env:"OAUTH_FACEBOOK_SECRET"`
+		Discord struct {
+			ClientID string `env:"OAUTH_DISCORD_CLIENTID"`
+			Secret   string `env:"OAUTH_DISCORD_SECRET"`
 		}
 		GitHub struct {
 			ClientID string `env:"OAUTH_GITHUB_CLIENTID"`

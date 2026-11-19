@@ -241,7 +241,7 @@ func OAuthToken() web.HandlerFunc {
 		}
 
 		// Fetch custom provider config once — used for role checking and trust check below.
-		// Returns nil for built-in providers (Google, Facebook, …).
+		// Returns nil for built-in providers (Google, Discord, …).
 		// Returns an error if the DB is unavailable — we fail hard rather than silently
 		// bypassing access controls.
 		customConfig, err := getCustomOAuthConfig(c, provider)
@@ -348,7 +348,7 @@ func backfillUserEmail(c *web.Context, user *entity.User, email string) {
 }
 
 // getCustomOAuthConfig fetches the custom OAuth provider config for the given provider.
-// Built-in providers (Google, Facebook, GitHub, …) are identified by the absence of a
+// Built-in providers (Google, Discord, GitHub, …) are identified by the absence of a
 // leading "_" and never have a custom config row, so the bus dispatch is skipped for them.
 // Returns (nil, nil) for built-in providers.
 // Returns (nil, err) if the DB lookup fails — callers must treat this as a hard error so

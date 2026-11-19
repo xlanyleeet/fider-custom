@@ -34,7 +34,7 @@ func TestRequiresSSRFGuard(t *testing.T) {
 		{"custom provider", "_custom", &entity.OAuthConfig{Provider: "_custom"}, true},
 		{"built-in GitHub", app.GitHubProvider, systemProvider(app.GitHubProvider), false},
 		{"built-in Google", app.GoogleProvider, systemProvider(app.GoogleProvider), false},
-		{"built-in Facebook", app.FacebookProvider, systemProvider(app.FacebookProvider), false},
+		{"built-in Discord", app.DiscordProvider, systemProvider(app.DiscordProvider), false},
 		// getConfig falls through to the tenant's custom config when a built-in
 		// provider is not enabled at instance level: fail closed.
 		{"tenant config named like a built-in", app.GitHubProvider, &entity.OAuthConfig{Provider: app.GitHubProvider}, true},

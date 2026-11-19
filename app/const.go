@@ -18,8 +18,10 @@ func createKey(name string) key {
 }
 
 const (
-	//FacebookProvider is const for 'facebook'
+	// FacebookProvider identifies legacy stored accounts; Facebook login is no longer supported.
 	FacebookProvider = "facebook"
+	// DiscordProvider identifies Discord OAuth accounts.
+	DiscordProvider = "discord"
 	//GoogleProvider is const for 'google'
 	GoogleProvider = "google"
 	//GitHubProvider is const for 'github'

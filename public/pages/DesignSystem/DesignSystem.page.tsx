@@ -326,7 +326,7 @@ const DesignSystemPage = () => {
 
           <HStack>
             <SocialSignInButton option={{ displayName: "GitHub", provider: "github" }} />
-            <SocialSignInButton option={{ displayName: "Facebook", provider: "facebook" }} />
+            <SocialSignInButton option={{ displayName: "Discord", provider: "discord" }} />
             <SocialSignInButton option={{ displayName: "Google", provider: "google" }} />
           </HStack>
         </VStack>

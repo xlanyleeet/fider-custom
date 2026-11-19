@@ -168,7 +168,7 @@ export const OAuthForm: React.FC<OAuthFormProps> = (props) => {
               <strong>Trusted source</strong>
               <p className="text-muted mt-1">
                 Users from this provider can join without an invite, even when the site is private or sign-ups are disabled. Use it for company identity
-                providers like Okta or Microsoft Entra, not public ones like Facebook. This site is currently <strong>{siteAccess}</strong>.
+                providers like Okta or Microsoft Entra, not public ones like Discord. This site is currently <strong>{siteAccess}</strong>.
               </p>
             </div>
             <Toggle field="isTrusted" ariaLabel="Trusted source" active={isTrusted} onToggle={setTrusted} />

@@ -48,6 +48,8 @@ services:
       LOG_CONSOLE: "true"
       LOG_SQL: "false"
       GOMEMLIMIT: 192MiB
+      OAUTH_DISCORD_CLIENTID: ${OAUTH_DISCORD_CLIENTID:-}
+      OAUTH_DISCORD_SECRET: ${OAUTH_DISCORD_SECRET:-}
     healthcheck:
       test: [CMD, ./fider, ping]
       interval: 10s

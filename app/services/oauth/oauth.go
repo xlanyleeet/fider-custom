@@ -26,7 +26,6 @@ import (
 	"github.com/getfider/fider/app/pkg/validate"
 	"github.com/getfider/fider/app/pkg/web"
 	"golang.org/x/oauth2"
-	"golang.org/x/oauth2/facebook"
 	"golang.org/x/oauth2/github"
 )
 
@@ -57,9 +56,11 @@ func (s Service) Init() {
 	bus.AddHandler(listAllOAuthProviders)
 }
 
-func getProviderStatus(key string) int {
-	if key == "" {
-		return enum.OAuthConfigDisabled
+func getProviderStatus(keys ...string) int {
+	for _, key := range keys {
+		if strings.TrimSpace(key) == "" {
+			return enum.OAuthConfigDisabled
+		}
 	}
 	return enum.OAuthConfigEnabled
 }
@@ -67,18 +68,18 @@ func getProviderStatus(key string) int {
 var (
 	systemProviders = []*entity.OAuthConfig{
 		{
-			Provider:          app.FacebookProvider,
-			DisplayName:       "Facebook",
-			ProfileURL:        "https://graph.facebook.com/me?fields=name,email",
-			Status:            getProviderStatus(env.Config.OAuth.Facebook.AppID),
+			Provider:          app.DiscordProvider,
+			DisplayName:       "Discord",
+			ProfileURL:        "https://discord.com/api/v10/users/@me",
+			Status:            getProviderStatus(env.Config.OAuth.Discord.ClientID, env.Config.OAuth.Discord.Secret),
 			IsTrusted:         false,
-			ClientID:          env.Config.OAuth.Facebook.AppID,
-			ClientSecret:      env.Config.OAuth.Facebook.Secret,
-			Scope:             "public_profile email",
-			AuthorizeURL:      facebook.Endpoint.AuthURL,
-			TokenURL:          facebook.Endpoint.TokenURL,
+			ClientID:          env.Config.OAuth.Discord.ClientID,
+			ClientSecret:      env.Config.OAuth.Discord.Secret,
+			Scope:             "identify email",
+			AuthorizeURL:      "https://discord.com/oauth2/authorize",
+			TokenURL:          "https://discord.com/api/oauth2/token",
 			JSONUserIDPath:    "id",
-			JSONUserNamePath:  "name",
+			JSONUserNamePath:  "global_name, username",
 			JSONUserEmailPath: "email",
 		},
 		{
@@ -383,7 +384,7 @@ func getOAuthRawProfile(ctx context.Context, q *query.GetOAuthRawProfile) error 
 // fixSystemProviderEmail adjusts the email in a built-in provider's profile body:
 //   - GitHub only returns the user's public email from /user, so when that is empty
 //     the primary verified address is fetched from /user/emails.
-//   - Google emails that are not verified are dropped, so they can't be used to
+//   - Google and Discord emails that are not verified are dropped, so they can't be used to
 //     match (and sign in as) an existing user with that email.
 func fixSystemProviderEmail(ctx context.Context, provider, body, accessToken string) string {
 	profile := map[string]json.RawMessage{}
@@ -407,9 +408,13 @@ func fixSystemProviderEmail(ctx context.Context, provider, body, accessToken str
 			return body
 		}
 		profile["email"], _ = json.Marshal(email)
-	case app.GoogleProvider:
+	case app.GoogleProvider, app.DiscordProvider:
 		var verified bool
-		_ = json.Unmarshal(profile["verified_email"], &verified)
+		verifiedField := "verified_email"
+		if provider == app.DiscordProvider {
+			verifiedField = "verified"
+		}
+		_ = json.Unmarshal(profile[verifiedField], &verified)
 		if verified {
 			return body
 		}

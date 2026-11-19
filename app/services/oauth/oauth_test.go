@@ -49,7 +49,7 @@ func ExpectAuthURL(actual, expectedPrefix, expectedRedirect, expectedSessionIDHa
 	Expect(claims.SessionIDHash).Equals(expectedSessionIDHash)
 	Expect(claims.ExpiresAt).IsNotNil()
 }
-func TestGetAuthURL_Facebook(t *testing.T) {
+func TestGetAuthURL_Discord(t *testing.T) {
 	RegisterT(t)
 	bus.Init(&oauth.Service{})
 
@@ -64,14 +64,14 @@ func TestGetAuthURL_Facebook(t *testing.T) {
 
 	ctx := newGetContext("http://login.test.fider.io:3000")
 	authURL := &query.GetOAuthAuthorizationURL{
-		Provider:      app.FacebookProvider,
+		Provider:      app.DiscordProvider,
 		Redirect:      "http://example.org",
 		SessionIDHash: "456",
 	}
 
 	err := bus.Dispatch(ctx, authURL)
 	Expect(err).IsNil()
-	ExpectAuthURL(authURL.Result, "https://www.facebook.com/v3.2/dialog/oauth?client_id=FB_CL_ID&redirect_uri=http%3A%2F%2Flogin.test.fider.io%3A3000%2Foauth%2Ffacebook%2Fcallback&response_type=code&scope=public_profile+email&state=", "http://example.org", "456")
+	ExpectAuthURL(authURL.Result, "https://discord.com/oauth2/authorize?client_id=DC_CL_ID&redirect_uri=http%3A%2F%2Flogin.test.fider.io%3A3000%2Foauth%2Fdiscord%2Fcallback&response_type=code&scope=identify+email&state=", "http://example.org", "456")
 }
 
 func TestGetAuthURL_Google(t *testing.T) {

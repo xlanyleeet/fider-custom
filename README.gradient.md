@@ -10,6 +10,14 @@
 General → Locale → Українська. Для нових дошок можна задати `LOCALE=uk`.
 Адміністративні сторінки, які upstream не локалізує, залишаються англійською.
 Посилання на вихідний код нашої версії додано в підвал сайту.
+Перенесено PR getfider/fider#1779: відповіді в гілках коментарів,
+сповіщення про відповіді й контент, що очікує на модерацію.
+Вхід через Facebook вилучено; додано Discord зі scope `identify email`.
+Для Discord потрібні `OAUTH_DISCORD_CLIENTID`, `OAUTH_DISCORD_SECRET`
+і Redirect URI `https://feedback.gradient-mc.com/oauth/discord/callback`.
+У Discord Developer Portal це OAuth Client Secret, а не токен бота.
+Непідтверджена Discord-адреса не використовується для автоматичного входу
+в наявний обліковий запис з такою електронною адресою.
 Production на `feedback.gradient-mc.com` оновлюється окремо після перевірки
 змін; створення цього форку саме по собі не змінює встановлений застосунок.
 

@@ -6,6 +6,9 @@ import (
 
 	"github.com/getfider/fider/app"
 	"github.com/getfider/fider/app/models/cmd"
+	"github.com/getfider/fider/app/models/enum"
+	"github.com/getfider/fider/app/models/entity"
+	"github.com/getfider/fider/app/models/query"
 	. "github.com/getfider/fider/app/pkg/assert"
 	"github.com/getfider/fider/app/pkg/bus"
 	"github.com/getfider/fider/app/pkg/jsonq"
@@ -92,4 +95,56 @@ func TestFixSystemProviderEmail_OtherProviders(t *testing.T) {
 	body := `{"id": "1", "email": "jon@example.com"}`
 	Expect(fixSystemProviderEmail(context.Background(), app.FacebookProvider, body, "TOKEN")).Equals(body)
 	Expect(fixSystemProviderEmail(context.Background(), "_custom", body, "TOKEN")).Equals(body)
+}
+
+func TestFixSystemProviderEmail_Discord(t *testing.T) {
+	RegisterT(t)
+	verified := `{"id":"123456789012345678","global_name":"Олена","email":"olena@example.com","verified":true}`
+	Expect(fixSystemProviderEmail(context.Background(), app.DiscordProvider, verified, "TOKEN")).Equals(verified)
+	for _, body := range []string{
+		`{"id":"123456789012345678","email":"other@example.com","verified":false}`,
+		`{"id":"123456789012345678","email":"other@example.com"}`,
+		`{"id":"123456789012345678","email":"other@example.com","verified":"true"}`,
+	} {
+		q := jsonq.New(fixSystemProviderEmail(context.Background(), app.DiscordProvider, body, "TOKEN"))
+		Expect(q.String("id")).Equals("123456789012345678")
+		Expect(q.Contains("email")).IsFalse()
+	}
+}
+
+func TestDiscordProfileNameFallback(t *testing.T) {
+	RegisterT(t)
+	bus.AddHandler(func(_ context.Context, q *query.GetTenantProviderStatus) error {
+		q.Result = &entity.TenantProvider{Provider: q.Provider, IsEnabled: true}
+		return nil
+	})
+	for _, tc := range []struct {
+		body string
+		name string
+	}{
+		{`{"id":"123456789012345678","global_name":"Олена","username":"olena"}`, "Олена"},
+		{`{"id":"123456789012345678","global_name":null,"username":"olena"}`, "olena"},
+	} {
+		command := &cmd.ParseOAuthRawProfile{Provider: app.DiscordProvider, Body: tc.body}
+		Expect(parseOAuthRawProfile(context.Background(), command)).IsNil()
+		Expect(command.Result.ID).Equals("123456789012345678")
+		Expect(command.Result.Name).Equals(tc.name)
+	}
+}
+
+func TestSystemProvidersExcludeFacebook(t *testing.T) {
+	for _, provider := range systemProviders {
+		if provider.Provider == app.FacebookProvider {
+			t.Fatal("Facebook must not be offered as a login provider")
+		}
+	}
+}
+
+func TestDiscordRequiresBothCredentials(t *testing.T) {
+	if getProviderStatus("client-id", "") != enum.OAuthConfigDisabled {
+		t.Fatal("Discord must be disabled without a client secret")
+	}
+	if getProviderStatus("", "secret") != enum.OAuthConfigDisabled {
+		t.Fatal("Discord must be disabled without a client ID")
+	}
 }
