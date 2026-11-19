@@ -1,0 +1,66 @@
+name: gradient-fider-preview
+
+services:
+  db:
+    image: postgres:17-alpine
+    restart: unless-stopped
+    mem_limit: 192m
+    environment:
+      POSTGRES_DB: fider
+      POSTGRES_USER: fider
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Run scripts/start-preview.ps1}
+    command: [postgres, -c, shared_buffers=32MB, -c, max_connections=30]
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: [CMD-SHELL, pg_isready -U fider -d fider]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  app:
+    image: gradient-fider:local
+    build:
+      context: ..
+      dockerfile: Dockerfile
+      args:
+        COMMITHASH: ${FIDER_COMMIT:-local}
+        VERSION: ${FIDER_VERSION:-gradient-local}
+    restart: unless-stopped
+    mem_limit: 256m
+    depends_on:
+      db:
+        condition: service_healthy
+      mailhog:
+        condition: service_started
+    ports:
+      - "127.0.0.1:${HTTP_PORT:-3001}:3000"
+    environment:
+      BASE_URL: http://localhost:${HTTP_PORT:-3001}
+      DATABASE_URL: postgres://fider:${POSTGRES_PASSWORD:?Run scripts/start-preview.ps1}@db:5432/fider?sslmode=disable
+      JWT_SECRET: ${JWT_SECRET:?Run scripts/start-preview.ps1}
+      EMAIL_NOREPLY: no-reply@example.com
+      EMAIL_SMTP_HOST: mailhog
+      EMAIL_SMTP_PORT: "1025"
+      EMAIL_SMTP_ENABLE_STARTTLS: "false"
+      EMAIL_SMTP_ENABLE_IMPLICIT_TLS: "false"
+      BLOB_STORAGE: sql
+      LOG_CONSOLE: "true"
+      LOG_SQL: "false"
+      GOMEMLIMIT: 192MiB
+    healthcheck:
+      test: [CMD, ./fider, ping]
+      interval: 10s
+      timeout: 5s
+      start_period: 60s
+      retries: 10
+
+  mailhog:
+    image: mailhog/mailhog:v1.0.1
+    restart: unless-stopped
+    mem_limit: 64m
+    ports:
+      - "127.0.0.1:${MAIL_UI_PORT:-8026}:8025"
+
+volumes:
+  pgdata:

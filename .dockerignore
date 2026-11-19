@@ -6,4 +6,7 @@ output
 cover.out
 scripts
 .env
+.env.*
+**/.env
+**/.env.*
 dist
